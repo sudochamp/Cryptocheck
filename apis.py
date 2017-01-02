@@ -27,13 +27,3 @@ def etheruem_price():
     except URLError, e:
         print 'Not Found'
 
-
-def tradingadvice():
-    randomNumber = random.randint(0, 1)
-
-    if randomNumber != 1:
-        while randomNumber < 0.5:
-            return 'Buy'
-    else:
-        while randomNumber > 0.5:
-            return 'Sell'
