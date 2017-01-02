@@ -11,7 +11,7 @@ logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)
 
 # Token for API
-TOKEN = "68779605:AAGAww5D1ZkWHCRDRwL23SZ-4RGiqv8XaUk"
+TOKEN = "ENTER YOUR TOKEN HERE"
 tb = telebot.TeleBot(TOKEN)
 
 
