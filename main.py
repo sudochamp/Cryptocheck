@@ -1,62 +1,42 @@
-import telebot
-import apis
 import logging
+from telegram.ext import Updater
+from telegram.ext import CommandHandler
+import apis
 import random
-import requests
-import time
-import sys
 
-# Logger for Debug
-logger = telebot.logger
-telebot.logger.setLevel(logging.DEBUG)
+TOKEN = "ENTER TOKEN HERE"
+updater = Updater(token=TOKEN)
 
-# Token for API
-TOKEN = "ENTER YOUR TOKEN HERE"
-tb = telebot.TeleBot(TOKEN)
+dispatcher = updater.dispatcher
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
-# Handles Recieved Messages
-@tb.message_handler(commands=['start', 'help'])
-def send_welcome(message):
-    tb.reply_to(message, "Wassup Doc?")
+def start(bot, update):
+    bot.send_message(chat_id=update.message.chat_id, text="Time for BTC")
 
+def list(bot, update):
+    chat_id = update.message.chat_id
+    btcPrice = apis.btcapi()
+    ethPrice = apis.ethapi()
+    zecPrice = apis.zecapi()
+    bot.send_message(chat_id=chat_id, text="BTCUSD: {0}\n"
+                                  "ETHUSD: {1}\n"
+                                  "ZECUSD: {2}\n".format(btcPrice, ethPrice, zecPrice))
 
-@tb.message_handler(commands=['btc'])
-def send_btcprice(message):
-    chat_id = message.chat.id
-    currentPrice, highestPrice, lowestPrice = apis.btcapi_bitstamp()
-    tb.send_message(chat_id, text="Bitstamp: {0}\n"
-                                  "High: {1}\n"
-                                  "Low: {2}\n".format(currentPrice, highestPrice, lowestPrice))
-
-
-@tb.message_handler(commands=['eth'])
-def send_ethprice(message):
-    chat_id = message.chat.id
-    tb.send_message(chat_id, text="Ethereum: " + str(apis.etheruem_price()))
-
-
-@tb.message_handler(commands=['ta'])
-def send_tradingadvice(message):
-    chat_id = message.chat.id
+def ta(bot, update):
+    chat_id = update.message.chat_id
     random_number = random.randint(0, 10)
     if random_number <= 5:
-        tb.send_message(chat_id, text="Buy")
+        bot.send_message(chat_id=chat_id, text="Buy")
     if random_number >= 5:
-        tb.send_message(chat_id, text="Sell")
+        update.send_message(chat_id=chat_id, text="Sell")
 
-@tb.message_handler(commands="sad")
-def send_NOOOOO(message):
-    chat_id = message.chat.id
-    audio = open('audio/no.mp3', 'rb')
-    tb.send_audio(chat_id, audio)
+start_handler = CommandHandler('start', start)
+coin_handler = CommandHandler('list', list)
+ta_handler = CommandHandler('ta', ta)
+dispatcher.add_handler(start_handler)
+dispatcher.add_handler(coin_handler)
+dispatcher.add_handler(ta_handler)
 
-while True:
-    try:
-        tb.polling(none_stop=True)
-    except requests.exceptions.ConnectionError as e:
-        print >> sys.stderr, str(e)
-        time.sleep(15)
-
-# Polls telegram servers for new messages
-tb.polling()
+updater.start_polling()
