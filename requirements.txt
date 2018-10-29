@@ -8,7 +8,7 @@ pyparsing==2.1.5
 pyTelegramBotAPI==2.3.0
 python-dateutil==2.5.3
 python-telegram-bot==5.0.0
-requests==2.12.4
+requests>=2.20.0
 singledispatch==3.4.0.3
 six==1.10.0
 tornado==4.4.1
